@@ -1,5 +1,6 @@
 .project
 .pydevproject
+src/_version.py
 .settings/*
 cli_tools.egg-info/*
 dist/*

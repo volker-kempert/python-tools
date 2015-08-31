@@ -2,12 +2,14 @@
 # -*- coding: utf-8 -*-
 
 import sys
+import os
 from os import path as p
+import subprocess
 
 try:
-    from setuptools import setup, find_packages
+    from setuptools import setup, find_packages, Command
 except ImportError:
-    from distutils.core import setup, find_packages
+    from distutils.core import setup, find_packages, Command
 
 
 def read(filename, parent=None):
@@ -37,7 +39,36 @@ def parse_requirements(filename, parent=None):
 try:
     from _version import __version__
 except ImportError:
-    __version__ = "0.1.a1"
+    __version__ = "0.1.a1-dirty"
+
+class GitVersionCommand(Command):
+    description = 'Extract version from git label'
+    user_options = []
+
+    def initialize_options(self):
+        self.cwd = None
+
+    def finalize_options(self):
+        self.cwd = os.getcwd()
+
+    def run(self):
+        """
+        Try to determine the version from git via git describe
+        if not possible leave the _version.py file untouched
+        """
+        message = "Must be in package root {0}".format(self.cwd)
+        assert os.getcwd() == self.cwd, message
+
+        version = None
+        try:
+            version = subprocess.check_output(["git", "describe"])
+            version = version[:-1]  # remove the last \r 
+        except subprocess.CalledProcessError:
+            pass
+        if version:
+            with open('src/_version.py', 'w') as f:
+                f.write("__version__ = '{0}'\n".format(version))
+
 
 readme = open('README.rst').read()
 
@@ -69,4 +100,7 @@ setup(
             'find-dups=find_duplicates:main',
             ]
         },
+    cmdclass={ 
+              'set_git_version': GitVersionCommand
+              },
 )
