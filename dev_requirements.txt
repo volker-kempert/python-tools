@@ -1,0 +1,3 @@
+# list of additionally required packages for development
+pytest
+mock

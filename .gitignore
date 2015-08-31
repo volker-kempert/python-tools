@@ -1,0 +1,6 @@
+.project
+.pydevproject
+.settings/*
+cli_tools.egg-info/*
+dist/*
+*.pyc
