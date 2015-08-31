@@ -2,14 +2,13 @@
 README
 ======
 
-Set of command line tools bundles in a python package
+Set of command line tools bundled in a python package
 
 
 License
 -------
 
 (c) 2015, Volker Kempert
-All rights reserved
 
 Licensed under MIT type of open source license.
 See the LICENSE file for details.
@@ -19,13 +18,13 @@ Content
 -------
 
 find-dups:
-   programm that helps to find duplicate files.
+   program that helps to find duplicate files.
 
 
 Deployment
 ----------
 
-install via pip
+install via *pip*
 
 
 Quickstart for development
