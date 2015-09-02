@@ -3,7 +3,7 @@
 
 import sys
 import argparse
-from .biz_func import process_candidate_files
+from .biz_func import *
 from utils.verbose import Verboser
 
 try:
@@ -23,11 +23,11 @@ def find_duplicates(root_dir):
     return process_candidate_files(root_dir)
 
 
-def format_duplicates(duplicates):
+def format_duplicates(duplicates, outfile):
     for files in duplicates:
         for file in files:
-            print "# rm " + file
-        print  "# --"
+            outfile.write( "# rm " + file + '\n')
+        outfile.write("# --\n")
 
 
 def parse_args(args=sys.argv):
@@ -49,17 +49,23 @@ def parse_args(args=sys.argv):
 
     parser.add_argument('-v', '--verbose', action='count', default=0,
                    help='print verbosity information (can be multiple given)')
+    parser.add_argument('-o', '--outfile',
+                        type=argparse.FileType('w'), default=sys.stdout,
+                        help='Write output to file instead of stdout')
 
     return parser.parse_args(args)
 
 
-def main(args=sys.argv):
+def main():
     """ find duplicates main function"""
-    args = parse_args(args)
+    args = parse_args(sys.argv[1:])
     Verboser().set_level(args.verbose)
     Verboser().verbose_min("Scandir {0}".format(args.scandir))
     duplicates = find_duplicates(args.scandir)
-    format_duplicates(duplicates)
+    sort_members(duplicates)
+    duplicates = make_unique(duplicates)
+    format_duplicates(duplicates, args.outfile)
+    args.outfile.close()
 
 
 if __name__ == "__main__":
