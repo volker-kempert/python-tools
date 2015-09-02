@@ -81,7 +81,8 @@ setup(
     author='Volker Kempert',
     author_email='volker.kempert@pixmeter.com',
     url='www.pixmeter.com',
-    packages=find_packages(),
+    package_dir={'': 'src'},
+    packages=find_packages(where='src', exclude=[]),
     py_modules = ['_version'],
 
     install_requires=parse_requirements('requirements.txt'),
