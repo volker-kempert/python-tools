@@ -62,19 +62,28 @@ def process_candidate_files(base_dir, other_dir=None):
         other_dir = base_dir
     Verboser.verbose('Scan-candidate: base: {0} other: {1}'.format(
                                                     base_dir, other_dir))
+    max_files = count_files(base_dir)
     complete_list = []
+    file_no = 0
+    old_percent = 0
     for directory, _, files in os.walk(base_dir):
         for file in files:
             full_name = os.path.join(directory, file)
             same_files = find_other_files(other_dir, full_name)
             if len(same_files) > 1:
                 complete_list.append(same_files)
+            file_no += 1
+            new_percent = int(file_no * 100 / max_files)
+            if old_percent < new_percent:
+                Verboser().verbose_max("Progress {0} %".format(new_percent))
+                old_percent = new_percent
+    Verboser().verbose_max("Found duplicates: {0}".format(len(complete_list)))
     return complete_list
 
 
 def find_other_files(base_dir, ref_file):
     """
-    Find files of the same conent as ref_file anywhere below base_dir
+    Find files of the same content as ref_file anywhere below base_dir
 
     :param base_dir (string): Name of the directory that is to be searched
     :param ref_file (string): Name of the reference file to be compared with
@@ -82,8 +91,8 @@ def find_other_files(base_dir, ref_file):
         empty list if there is no duplicate found, otherwise ref_file will
         be placed into the list as well
     """
-    Verboser.verbose_max('Find-other-files: Dir : {0}, Ref-file {1}'.format(
-                                                    base_dir, ref_file))
+    Verboser.verbose_debug('Dir : {0}, Ref-file {1}'.format(base_dir, ref_file),
+                           func=find_other_files.__name__)
     same_files = []
     for directory, _, files in os.walk(base_dir):
         for file in files:
@@ -96,3 +105,30 @@ def find_other_files(base_dir, ref_file):
         same_files.append(ref_file)
     return same_files
 
+def sort_members(items):
+    Verboser().verbose("Sort Items")
+    for item in items:
+        item.sort()
+
+
+def make_unique(original_list):
+    Verboser().verbose("Remove duplicate items")
+    unique_list = []
+    map(lambda x: unique_list.append(x) if (x not in unique_list) 
+                                        else False, original_list)
+    Verboser().verbose_max("Reduced duplicates to {0}".format(len(unique_list)))
+    return unique_list
+
+
+def count_files(base_dir):
+    """
+    count the number of below base_dir
+
+    :param base_dir (string): Name of the directory that is to be searched
+    :returns (int): number of files
+    """
+    count = 0
+    for directory, _, files in os.walk(base_dir):
+        for file in files:
+            count += 1
+    return count
