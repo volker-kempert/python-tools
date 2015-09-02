@@ -7,7 +7,7 @@ import find_duplicates
 
 
 def test_main_parse_default_args():
-    args = find_duplicates.parse_args([])
+    args = find_duplicates.parse_args(['.'])
     assert args.scandir == '.'
     assert not args.verbose
 

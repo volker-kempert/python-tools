@@ -3,6 +3,8 @@
 
 import sys
 import argparse
+from .biz_func import process_candidate_files
+from utils.verbose import Verboser
 
 try:
     from _version import __version__
@@ -18,7 +20,14 @@ def find_duplicates(root_dir):
         files shall be searched for
     :returns (list): containing lists of strings with file names (full path)
     """
-    return [['foo', 'bar']]
+    return process_candidate_files(root_dir)
+
+
+def format_duplicates(duplicates):
+    for files in duplicates:
+        for file in files:
+            print "# rm " + file
+        print  "# --"
 
 
 def parse_args(args=sys.argv):
@@ -26,27 +35,32 @@ def parse_args(args=sys.argv):
     parser = argparse.ArgumentParser(prog='find_duplicates', description="""
         Find duplicates in file system
 
-        Scan a directory for duplicate files by checking name, size and md5
+        Scan a directory for duplicate files by checking name, size and md5.
         The output is written to stdout.
         - Each filename (full path) is written in one line
         - Set of identical file names is separated by a line containing '--'
 
         """)
+    parser.add_argument('scandir', action='store', default='.',
+                        help='Name of the directory to scan')
     parser.add_argument('--version',
                    help='Print the package version to stdout',
                    action='version', version='%(prog)s ' + __version__)
 
-    parser.add_argument('-v', '--verbose', action='store_true',
-                   help='print verbosity information')
-    parser.add_argument('scandir', nargs='?', default='.',
-                   help='Name of the directory to scan')
+    parser.add_argument('-v', '--verbose', action='count', default=0,
+                   help='print verbosity information (can be multiple given)')
+
     return parser.parse_args(args)
 
 
 def main(args=sys.argv):
     """ find duplicates main function"""
     args = parse_args(args)
+    Verboser().set_level(args.verbose)
+    Verboser().verbose_min("Scandir {0}".format(args.scandir))
     duplicates = find_duplicates(args.scandir)
+    format_duplicates(duplicates)
+
 
 if __name__ == "__main__":
     main()
