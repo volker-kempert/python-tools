@@ -98,7 +98,8 @@ setup(
     test_suite='tests',
     entry_points={
         'console_scripts': [
-            'find-dups=find_duplicates:main',
+            'find-dups=find_duplicates.cli_find_dups:main',
+            'filter-dups=find_duplicates.cli_filter_dups:main',
             ]
         },
     cmdclass={ 

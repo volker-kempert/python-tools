@@ -3,7 +3,7 @@
 from os.path import basename, getsize
 import hashlib
 import os
-from utils.verbose import Verboser
+from verbose import Verboser
 
 # or-able flags
 CHECK_NAME = 0x01
@@ -132,3 +132,41 @@ def count_files(base_dir):
         for file in files:
             count += 1
     return count
+
+
+def handle_based_on_filter(duplicates, filter):
+    """ Filter of all files that are located that have misc as part of dir
+
+    :param duplicates (list of lists): contain duplicate file record)
+    :param filter (function): Take recode return True/false if the filter applies
+    :returns (tuple): of handled and not_handled sets
+    """
+    handled = []
+    not_handled = []
+
+    for record in duplicates:
+        if filter(record):
+            handled.append(record)
+        else:
+            not_handled.append(record)
+    Verboser().verbose_max("Orig {2} Filtered misc {0} remainder {1}".format(
+                            len(handled), len(not_handled), len(duplicates)))
+    return (handled, not_handled)
+
+
+def remove_misc(duplicates):
+    """ Filter of all files that are located that have misc as part of dir
+    :returns (tuple): of handled and not_handled sets
+    """
+    def filter(record):
+        return 2 == len(record) and 'misc' in record[1]
+    return handle_based_on_filter(duplicates, filter)
+
+
+def remove_2014(duplicates):
+    """ Filter of all files that are located that have 2014 as part of dir
+    :returns (tuple): of handled and not_handled sets
+    """
+    def filter(record):
+        return 2 == len(record) and '/2014/' in record[1]
+    return handle_based_on_filter(duplicates, filter)
